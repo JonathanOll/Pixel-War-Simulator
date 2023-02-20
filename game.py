@@ -28,19 +28,19 @@ class Game:
         self.running = False
     
     def save(self, file_path):
-        file = open(file_path, "w+")
+        file = open(file_path, "wb+")
 
-        file.write(str(len(self.map[0])) + " " + str(len(self.map)) + "\n")
+        file.write((str(len(self.map[0])) + " " + str(len(self.map)) + "\n").encode())
 
         for row in self.map:
 
-            file.write(" ".join(str(i) for i in row) + "\n")
+            file.write((" ".join(str(i) for i in row) + "\n").encode())
 
-        file.write("|")
+        file.write("|".encode())
 
         for team in self.teams:
 
-            file.write(team.name + "," + str(team.color[0]) + " " + str(team.color[1]) + " " + str(team.color[2]) + "," + str(team.power) + "\n")
+            file.write((team.name + "," + str(team.color[0]) + " " + str(team.color[1]) + " " + str(team.color[2]) + "," + str(team.power) + "\n").encode())
 
         file.close()
 
@@ -50,9 +50,9 @@ class Game:
         
         self.teams.clear()
 
-        file = open(file_path, "r")
+        file = open(file_path, "rb")
 
-        s = file.read()
+        s = file.read().decode()
 
         ints = []
 
@@ -114,7 +114,10 @@ class Game:
             x, y = args[0]
         elif len(args) == 2:
             x, y = args
-        return self.map[y][x]
+        try:
+            return self.map[y][x]
+        except:
+            print(x, y, len(self.map[0]), len(self.map))
 
     def is_valid(self, *args):  # vérifier la validité d'une position
         if len(args) == 1:
@@ -141,34 +144,36 @@ class Game:
             x, y = args[0]
         elif len(args) == 2:
             x, y = args
-        res = [0] * len(self.teams)
+        res = {}
         for dx, dy in dirs:
             pos = (x+dx, y+dy)
             if self.is_valid(pos) and self.get(pos) > 0:
-                res[self.get(pos) - 1] += force_around
+                team = self.get(pos) - 1
+                if team in res:
+                    res[team] += force_around
+                else:
+                    res[team] = force_around
         if self.is_valid(x, y) and self.get(x, y) > 0:
-            res[self.get(x, y) - 1] += force_on_position
+            team = self.get(x, y) - 1
+            if team in res:
+                res[team] += force_on_position
+            else:
+                res[team] = force_on_position
         total = sum(i.count for i in self.teams) 
-        for i in range(len(self.teams)):
+        for i in res.keys():
             if res[i] != 0:
                 res[i] += self.teams[i].power + round(self.teams[i].count / total * area_force)
         return res
 
     def battle(self, forces):
-        zeros = 0
-        for i in range(len(forces)):
-            if forces[i] == 0: 
-                zeros += 1
-                forces[i] = -999
-            else:
-                forces[i] += randint(rand_min, rand_max)
-        if zeros == len(self.teams):
+        if len(forces) == 0:
             return -1
-        elif zeros == len(self.teams) - 1:
-            for i in range(len(forces)):
-                if forces[i] > 0: return i
-        max_index = 0
-        for i in range(len(forces)):
+        elif len(forces) == 1:
+            return list(forces.keys())[0]
+        for i in forces.keys():
+            forces[i] += randint(rand_min, rand_max)
+        max_index = list(forces.keys())[0]
+        for i in forces.keys():
             if forces[i] > forces[max_index]:
                 max_index = i
             elif forces[i] == forces[max_index] and randint(1, 2) == 1:

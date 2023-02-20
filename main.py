@@ -27,10 +27,8 @@ ranking.extend(game.teams)
 selected_team = 0
 pen_size = 5
 
-
 def update_ranking():
     ranking.sort(key=lambda a: -a.count)
-
 
 def draw(screen):
     pygame.draw.rect(screen, game.teams[selected_team - 1].color if selected_team > 0 else empty_ground_color, (10, 10, 25, 25))
@@ -75,7 +73,9 @@ while True:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             x = round((mouse_x - (screen_width // 2 - map_size[0] // 2)) / (map_size[0]) * len(game.map[0]))
             y = round((mouse_y - (screen_height // 2 - map_size[1] // 2)) / (map_size[1]) * len(game.map[1]))
-            if pygame.key.get_pressed()[pygame.K_LCTRL]:
+            if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+                print(game.count_around(x, y))
+            elif pygame.key.get_pressed()[pygame.K_LCTRL]:
                 selected_team  = game.map[y][x]
             else:
                 if pen_size > 1:
