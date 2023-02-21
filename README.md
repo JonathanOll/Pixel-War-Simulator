@@ -3,6 +3,8 @@
 [![image](https://img.shields.io/badge/Library-Pygame-orange)](https://www.pygame.org/)
 [![image](https://img.shields.io/badge/Author-JonathanOll-blue)](https://github.com/JonathanOll/)
 
+![image](https://user-images.githubusercontent.com/70845195/220424481-0bc6bf46-093b-47a3-b290-04dd1d7a4973.png)
+
 Programme de simulation de "guerre" de territoire sur une carte
 
 ## Fonctionnement
