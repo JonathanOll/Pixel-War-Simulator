@@ -14,6 +14,7 @@ Vous pouvez créer une carte à partir d'une image, puis ajouter des équipes et
 - On rajoute le pouvoir correspondant au pourcentage du terrain possédé par l'équipe (3 points au total)
 - On ajoute à chaque équipe un pouvoir aléatoire entre 1 et 6
 - L'équipe possédant le plus de pouvoir sur la case la remporte
+- 
 le cycle continue jusqu'à l'éradication de toutes les autres équipes par les vainqueurs.
 
 ## Exemple d'une partie
