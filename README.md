@@ -7,7 +7,14 @@ Programme de simulation de "guerre" de territoire sur une carte
 
 ## Fonctionnement
 
-Vous pouvez créer une carte à partir d'une image, puis ajouter des équipes et leur assigner un terrain, avec possibilité d'avoir des zones neutres. Appuyez sur espace pour lancer la bataille. À chaque itération, tous les pixels de la map sont rafraichis de la manière suivante: on prend la couleur de tous les pixels adjacents et on ajoute 1 au pouvoir de l'équipe auquel il appartient, on ajoute 2 de pouvoir à l'équipe qui possède déjà le pixel, on rajoute le pouvoir correspondant au pourcentage du terrain possédé par l'équipe (3 points au total), on ajoute à chaque équipe un pouvoir aléatoire entre 1 et 6, l'équipe possédant le plus de pouvoir sur la case la remporte, le cycle continue jusqu'à l'éradication de toutes les autres équipes par les vaiqueurs.
+Vous pouvez créer une carte à partir d'une image, puis ajouter des équipes et leur assigner un terrain, avec possibilité d'avoir des zones neutres. Appuyez sur espace pour lancer la bataille. 
+À chaque itération, tous les pixels de la map sont rafraichis de la manière suivante: 
+- On prend la couleur de tous les pixels adjacents et on ajoute 1 au pouvoir de l'équipe auquel il appartient
+- On ajoute 2 de pouvoir à l'équipe qui possède déjà le pixel
+- On rajoute le pouvoir correspondant au pourcentage du terrain possédé par l'équipe (3 points au total)
+- On ajoute à chaque équipe un pouvoir aléatoire entre 1 et 6
+- L'équipe possédant le plus de pouvoir sur la case la remporte
+le cycle continue jusqu'à l'éradication de toutes les autres équipes par les vainqueurs.
 
 ## Exemple d'une partie
 
