@@ -8,6 +8,7 @@ Programme de simulation de "guerre" de territoire sur une carte
 ## Fonctionnement
 
   Vous pouvez créer une carte à partir d'une image, puis ajouter des équipes et leur assigner un terrain (flèches directionnelles pour sélectionner l'équipe et la molette pour changer la taille du pinceau), avec possibilité d'avoir des zones neutres. Appuyez sur espace pour lancer la bataille. 
+
 À chaque itération, tous les pixels de la map sont rafraichis de la manière suivante: 
 - On prend la couleur de tous les pixels adjacents et on ajoute 1 au pouvoir de l'équipe auquel il appartient
 - On ajoute 2 de pouvoir à l'équipe qui possède déjà le pixel
