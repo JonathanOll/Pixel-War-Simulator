@@ -13,6 +13,7 @@ Programme de simulation de "guerre" de territoire sur une carte
 - On prend la couleur de tous les pixels adjacents et on ajoute 1 au pouvoir de l'équipe auquel il appartient
 - On ajoute 2 de pouvoir à l'équipe qui possède déjà le pixel
 - On rajoute le pouvoir correspondant au pourcentage du terrain possédé par l'équipe (3 points au total)
+- S'ils sont activés, on rajoute à chaque équipe les points qui leur sont dûs pour le contrôle de points de contrôle (les drapeaux)
 - On ajoute à chaque équipe un pouvoir aléatoire entre 1 et 6
 - L'équipe possédant le plus de pouvoir sur la case la remporte
 
