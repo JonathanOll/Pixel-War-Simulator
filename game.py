@@ -4,6 +4,7 @@ from time import time
 import pygame
 from PIL import Image
 from numpy import asarray
+import math
 
 class Team:
     def __init__(self, name, color, power=0):
@@ -26,6 +27,16 @@ class Game:
         self.teams = teams
         self.last_update = time()
         self.running = False
+        self.winner = ""
+        self.total = 999999
+    
+    def update_total(self):
+        res = 0
+        for y in range(len(self.map)):
+            for x in range(len(self.map[y])):
+                if self.map[y][x] != -1:
+                    res += 1
+        self.total = res
     
     def save(self, file_path):
         file = open(file_path, "wb+")
@@ -56,7 +67,6 @@ class Game:
 
         ints = []
 
-
         for i in s.split("\n"):
             ints.extend(i.split(" "))
 
@@ -77,6 +87,8 @@ class Game:
             self.teams.append(t)
         
         self.update_counts()
+
+        self.update_total()
         
         print("map loaded from", file_path)
 
@@ -87,6 +99,7 @@ class Game:
         matrix = asarray(Image.open(file_path))
         self.map = [[-1] * len(matrix[0]) for i in range(len(matrix))]
         teams = {}
+        
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 color = (matrix[y][x][0], matrix[y][x][1], matrix[y][x][2])
@@ -99,7 +112,11 @@ class Game:
                     t = Team(str(len(self.teams)), color)
                     self.teams.append(t)
                     self.map[y][x] = teams[color]
+        
         self.update_counts()
+        
+        self.update_total()
+
 
     def gen(self, func):
         for y in range(len(self.map)):
@@ -159,10 +176,9 @@ class Game:
                 res[team] += force_on_position
             else:
                 res[team] = force_on_position
-        total = sum(i.count for i in self.teams) 
         for i in res.keys():
             if res[i] != 0:
-                res[i] += self.teams[i].power + round(self.teams[i].count / total * area_force)
+                res[i] += self.teams[i].power + round(self.teams[i].count / self.total * area_force)
         return res
 
     def battle(self, forces):
@@ -185,6 +201,8 @@ class Game:
         for i in range(len(self.teams)):
             if self.teams[i].count == 0:
                 zeros += 1
+            else:
+                self.winner = i
         return zeros >= len(self.teams) - 1
 
     def tick(self):  # mettre à jour pour un cycle
@@ -211,7 +229,9 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
+                size = math.ceil(map_height / len(self.map))
                 r = (round(rect[0] + x / len(self.map[y]) * rect[2]), round(rect[1] + y / len(self.map) * rect[3]), rect[2] / len(self.map[y]), rect[3] / len(self.map))
+                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, round(screen_height / 2 - map_height / 2) + y * size, size, size)
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
                 elif team == 0:
@@ -219,5 +239,5 @@ class Game:
                 else:
                     pygame.draw.rect(screen, background_color, r)
         if self.check_end():
-            text = font.render("Partie terminée", True, (0, 0, 0))
+            text = font.render(self.teams[self.winner].name + " remporte la partie", True, (0, 0, 0))
             screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
