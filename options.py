@@ -7,7 +7,7 @@ force_on_position = 2  # force d'une case si une troupe est placée dessus
 force_around = 1  # force d'une case si une troupe est placée sur un case adjacente
 area_force = 1.5  # force due au pourcentage de possession du terrain
 
-rand_min, rand_max = 1, 10  # limites de force ajoutée au hasard
+rand_min, rand_max = 1, 6  # limites de force ajoutée au hasard
 
 ticks_per_second = 60  # nombre de mise à jour par seconde
 

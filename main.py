@@ -2,8 +2,7 @@ import pygame
 import sys
 from time import time
 from options import *
-from game import Game, Team
-from random import randint
+from game import Game
 import math
 
 
