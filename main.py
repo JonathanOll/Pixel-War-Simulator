@@ -19,6 +19,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # game
 game = Game((50, 50), [])
 game.load("maps/Europe.sav")
+# game.load("maps/Europe.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []
@@ -84,7 +85,7 @@ while True:
             x = round((mouse_x - (screen_width // 2 - math.ceil(map_height / len(game.map)) * len(game.map[0]) // 2)) / (math.ceil(map_height / len(game.map))))
             y = round((mouse_y - (screen_height // 2 - map_height // 2)) / (math.ceil(map_height / len(game.map))))
             if pygame.key.get_pressed()[pygame.K_LSHIFT]:
-                print(game.count_around(x, y))
+                print((x, y))
             elif pygame.key.get_pressed()[pygame.K_LCTRL]:
                 selected_team  = game.map[y][x]
             else:
@@ -102,13 +103,12 @@ while True:
             if pen_size < 1 : pen_size = 1
     
     game.update()
+    if time() - last_ranking_update > 1:
+        update_ranking()
+        last_ranking_update = time()
 
     screen.fill((0, 0, 0))
     game.draw(screen)
     draw(screen)
-
-    if time() - last_ranking_update > 1:
-        update_ranking()
-        last_ranking_update = time()
 
     pygame.display.flip()

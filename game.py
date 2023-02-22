@@ -5,6 +5,7 @@ import pygame
 from PIL import Image
 from numpy import asarray
 import math
+from pygame import transform
 
 class Team:
     def __init__(self, name, color, power=0):
@@ -29,7 +30,9 @@ class Game:
         self.running = False
         self.winner = ""
         self.total = 999999
-    
+        self.power_points = []
+        self.tick_count = 0
+
     def update_total(self):
         res = 0
         for y in range(len(self.map)):
@@ -46,6 +49,11 @@ class Game:
         for row in self.map:
 
             file.write((" ".join(str(i) for i in row) + "\n").encode())
+
+        file.write("|".encode())
+
+        for point in self.power_points:
+            file.write((str(point[0]) + "," + str(point[1])).encode())
 
         file.write("|".encode())
 
@@ -77,6 +85,12 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 self.map[y][x] = int(ints[2 + y * int(ints[0]) + x])
+
+        points = s.split("|")[1].split("\n")
+
+        for point in points[:-1]:
+            coords = point.split(",")
+            self.power_points.append((int(coords[0]), int(coords[1])))
 
         teams = s.split("|")[-1].split("\n")
         
@@ -179,6 +193,10 @@ class Game:
         for i in res.keys():
             if res[i] != 0:
                 res[i] += self.teams[i].power + round(self.teams[i].count / self.total * area_force)
+        if self.tick_count >= flag_activation:
+            for point in self.power_points:
+                if self.get(point) - 1 in res:
+                    res[self.get(point) - 1] += power_point_force
         return res
 
     def battle(self, forces):
@@ -218,6 +236,7 @@ class Game:
                     result[y][x] = self.map[y][x]
         self.map = result
         self.last_update = time()
+        self.tick_count += 1
     
     def update(self):  # mettre à jour en fonction du temps passé depuis la derniere mise à jour
         if self.check_end():
@@ -226,18 +245,23 @@ class Game:
             self.tick()
 
     def draw(self, screen, rect=(290, 10, 700, 700)):
+        size = math.ceil(map_height / len(self.map))
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
-                size = math.ceil(map_height / len(self.map))
                 r = (round(rect[0] + x / len(self.map[y]) * rect[2]), round(rect[1] + y / len(self.map) * rect[3]), rect[2] / len(self.map[y]), rect[3] / len(self.map))
-                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, round(screen_height / 2 - map_height / 2) + y * size, size, size)
+                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size, size, size)
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
                 elif team == 0:
                     pygame.draw.rect(screen, empty_ground_color, r)
                 else:
                     pygame.draw.rect(screen, background_color, r)
+        flag = transform.scale(flag_img, (4*size, 5*size))
+        disabled_flag = transform.scale(disabled_flag_img, (4*size, 5*size))
+        for x, y in self.power_points:
+            r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size - flag.get_height(), 20, 20)
+            screen.blit((flag if self.tick_count >= flag_activation else disabled_flag), r)
         if self.check_end():
             text = font.render(self.teams[self.winner].name + " remporte la partie", True, (0, 0, 0))
             screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
