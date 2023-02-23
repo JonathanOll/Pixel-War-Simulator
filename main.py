@@ -18,7 +18,8 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 # game
 game = Game((50, 50), [])
-game.load("maps/Europe.sav")
+game.load("maps/Départements de France.sav")
+game.load("maps/Régions de France.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []
@@ -27,7 +28,6 @@ count = 0
 
 selected_team = 0
 pen_size = 5
-
 
 def update_ranking():
     global count

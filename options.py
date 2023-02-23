@@ -6,9 +6,10 @@ show_interface = False  # afficher le classement
 
 force_on_position = 2  # force d'une case si une troupe est placée dessus
 force_around = 1  # force d'une case si une troupe est placée sur un case adjacente
-area_force = 1  # force due au pourcentage de possession du terrain
+force_port = 3  # force d'une case portuaire
+area_force = 2  # force due au pourcentage de possession du terrain
 power_point_force = 1  # force donnée par le contrôle d'une zone de pouvoir
-flag_activation = 750  # tick à partir duquel sont activés les zones de pouvoir
+flag_activation = 150  # tick à partir duquel sont activés les zones de pouvoir
 
 rand_min, rand_max = 1, 10  # limites de force ajoutée au hasard
 

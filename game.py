@@ -58,14 +58,14 @@ class Game:
         file.write("|".encode())
 
         for point in self.power_points:
-            file.write((str(point[0]) + "," + str(point[1])).encode())
+            file.write((str(point[0]) + "," + str(point[1]) + "\n").encode())
 
         # ports
 
         file.write("|".encode())
         
         for (x,y), (x2,y2) in self.ports:
-            file.write((str(x) + "," + str(y) + " " + str(x2) + "," + str(y2)).encode())
+            file.write((str(x) + "," + str(y) + " " + str(x2) + "," + str(y2) + "\n").encode())
 
         # teams
 
@@ -218,6 +218,19 @@ class Game:
                 res[team] += force_on_position
             else:
                 res[team] = force_on_position
+        for port in self.ports:
+            if (x, y) == port[0]:
+                team = self.get(port[1]) - 1
+                if team in res:
+                    res[team] += force_port
+                else:
+                    res[team] = force_port
+            elif (x, y) == port[1]:
+                team = self.get(port[0]) - 1
+                if team in res:
+                    res[team] += force_port
+                else:
+                    res[team] = force_port
         for i in res.keys():
             if res[i] != 0:
                 res[i] += self.teams[i].power + round(self.teams[i].count / self.total * area_force)
@@ -225,21 +238,6 @@ class Game:
             for point in self.power_points:
                 if self.get(point) - 1 in res:
                     res[self.get(point) - 1] += power_point_force
-        for port in self.ports:
-            if (x, y) == port[0]:
-                team = self.get(port[1]) - 1
-                if team in res:
-                    res[team] += force_around
-                else:
-                    res[team] = force_around
-            elif (x, y) == port[1]:
-                team = self.get(port[0]) - 1
-                if team in res:
-                    res[team] += force_around
-                else:
-                    res[team] = force_around
-            
-
         return res
 
     def battle(self, forces):
