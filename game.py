@@ -13,6 +13,7 @@ class Team:
         self.color = color
         self.power = power
         self.count = 0
+        
 
 dirs = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -33,6 +34,13 @@ class Game:
         self.power_points = []
         self.tick_count = 0
         self.ports = []
+        self.force_on_position = 2  # force d'une case si une troupe est placée dessus
+        self.force_around = 1  # force d'une case si une troupe est placée sur un case adjacente
+        self.force_port = 3  # force d'une case portuaire
+        self.area_force = 2  # force due au pourcentage de possession du terrain
+        self.power_point_force = 1  # force donnée par le contrôle d'une zone de pouvoir
+        self.flag_activation = 150  # tick à partir duquel sont activés les zones de pouvoir
+        self.rand_min, self.rand_max = 1, 10  # limites de force ajoutée au hasard
 
     def update_total(self):
         res = 0
@@ -45,7 +53,10 @@ class Game:
     def save(self, file_path):
         file = open(file_path, "wb+")
     
-        file.write((str(len(self.map[0])) + " " + str(len(self.map)) + "\n").encode())
+        file.write((str(len(self.map[0])) + " " + str(len(self.map)) + " " + str(self.force_on_position) + \
+                    " " + str(self.force_around) + " " + str(self.force_port) + " " + str(self.area_force) + \
+                    " " + str(self.power_point_force) + " " + str(self.flag_activation) + " " + str(self.rand_min) + \
+                    " " + str(self.rand_max) + "\n").encode())
 
         # map
 
@@ -93,14 +104,21 @@ class Game:
 
         ints = []
 
-        for i in s.split("\n"):
+        for i in s.split("|")[0].split("\n"):
             ints.extend(i.split(" "))
 
         self.map = [[-1] * int(ints[0]) for i in range(int(ints[1]))]
+        self.force_on_position = int(ints[2])
+        self.force_around = int(ints[3])
+        self.force_port = int(ints[4])
+        self.area_force = int(ints[5])
+        self.power_point_force = int(ints[6])
+        self.flag_activation = int(ints[7])
+        self.rand_min, self.rand_max = int(ints[8]), int(ints[9])
 
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
-                self.map[y][x] = int(ints[2 + y * int(ints[0]) + x])
+                self.map[y][x] = int(ints[10 + y * int(ints[0]) + x])
 
         points = s.split("|")[1].split("\n")
 
@@ -110,7 +128,6 @@ class Game:
                 self.power_points.append((int(coords[0]), int(coords[1])))
 
         points = s.split("|")[2].split("\n")
-        print(len(points))
 
         if len(points) > 1:
             for point in points[:-1]:
@@ -209,35 +226,35 @@ class Game:
             if self.is_valid(pos) and self.get(pos) > 0:
                 team = self.get(pos) - 1
                 if team in res:
-                    res[team] += force_around
+                    res[team] += self.force_around
                 else:
-                    res[team] = force_around
+                    res[team] = self.force_around
         if self.is_valid(x, y) and self.get(x, y) > 0:
             team = self.get(x, y) - 1
             if team in res:
-                res[team] += force_on_position
+                res[team] += self.force_on_position
             else:
-                res[team] = force_on_position
+                res[team] = self.force_on_position
         for port in self.ports:
             if (x, y) == port[0]:
                 team = self.get(port[1]) - 1
                 if team in res:
-                    res[team] += force_port
+                    res[team] += self.force_port
                 else:
-                    res[team] = force_port
+                    res[team] = self.force_port
             elif (x, y) == port[1]:
                 team = self.get(port[0]) - 1
                 if team in res:
-                    res[team] += force_port
+                    res[team] += self.force_port
                 else:
-                    res[team] = force_port
+                    res[team] = self.force_port
         for i in res.keys():
             if res[i] != 0:
-                res[i] += self.teams[i].power + round(self.teams[i].count / self.total * area_force)
-        if self.tick_count >= flag_activation:
+                res[i] += self.teams[i].power + round(self.teams[i].count / self.total * self.area_force)
+        if self.tick_count >= self.flag_activation:
             for point in self.power_points:
                 if self.get(point) - 1 in res:
-                    res[self.get(point) - 1] += power_point_force
+                    res[self.get(point) - 1] += self.power_point_force
         return res
 
     def battle(self, forces):
@@ -246,7 +263,7 @@ class Game:
         elif len(forces) == 1:
             return list(forces.keys())[0]
         for i in forces.keys():
-            forces[i] += randint(rand_min, rand_max)
+            forces[i] += randint(self.rand_min, self.rand_max)
         max_index = list(forces.keys())[0]
         for i in forces.keys():
             if forces[i] > forces[max_index]:
@@ -301,7 +318,7 @@ class Game:
         disabled_flag = transform.scale(disabled_flag_img, (4*size, 5*size))
         for x, y in self.power_points:
             r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size - flag.get_height(), 20, 20)
-            screen.blit((flag if self.tick_count >= flag_activation else disabled_flag), r)
+            screen.blit((flag if self.tick_count >= self.flag_activation else disabled_flag), r)
         for (x, y), (x2, y2) in self.ports:
             pygame.draw.line(screen, port_color, (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size + size//2, 10 + y * size + size//2), (round(screen_width / 2 - size * len(self.map[0]) / 2) + x2 * size + size//2, 10 + y2 * size + size//2), width=5)
         if self.check_end():
