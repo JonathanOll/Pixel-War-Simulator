@@ -32,6 +32,7 @@ class Game:
         self.total = 999999
         self.power_points = []
         self.tick_count = 0
+        self.ports = []
 
     def update_total(self):
         res = 0
@@ -43,17 +44,30 @@ class Game:
     
     def save(self, file_path):
         file = open(file_path, "wb+")
-
+    
         file.write((str(len(self.map[0])) + " " + str(len(self.map)) + "\n").encode())
+
+        # map
 
         for row in self.map:
 
             file.write((" ".join(str(i) for i in row) + "\n").encode())
 
+        # points de contrôle
+
         file.write("|".encode())
 
         for point in self.power_points:
             file.write((str(point[0]) + "," + str(point[1])).encode())
+
+        # ports
+
+        file.write("|".encode())
+        
+        for (x,y), (x2,y2) in self.ports:
+            file.write((str(x) + "," + str(y) + " " + str(x2) + "," + str(y2)).encode())
+
+        # teams
 
         file.write("|".encode())
 
@@ -68,17 +82,19 @@ class Game:
     def load(self, file_path):
         
         self.teams.clear()
+        self.ports.clear()
+        self.power_points.clear()
 
         file = open(file_path, "rb")
 
         s = file.read().decode()
+        
+        file.close()
 
         ints = []
 
         for i in s.split("\n"):
             ints.extend(i.split(" "))
-
-        file.close()
 
         self.map = [[-1] * int(ints[0]) for i in range(int(ints[1]))]
 
@@ -88,9 +104,19 @@ class Game:
 
         points = s.split("|")[1].split("\n")
 
-        for point in points[:-1]:
-            coords = point.split(",")
-            self.power_points.append((int(coords[0]), int(coords[1])))
+        if len(points) > 1:
+            for point in points[:-1]:
+                coords = point.split(",")
+                self.power_points.append((int(coords[0]), int(coords[1])))
+
+        points = s.split("|")[2].split("\n")
+        print(len(points))
+
+        if len(points) > 1:
+            for point in points[:-1]:
+                p = point.split(" ")
+                self.ports.append(((int(p[0].split(",")[0]), int(p[0].split(",")[1])), (int(p[1].split(",")[0]), int(p[1].split(",")[1]))))
+        
 
         teams = s.split("|")[-1].split("\n")
         
@@ -109,6 +135,8 @@ class Game:
     def load_from_img(self, file_path):
 
         self.teams.clear()
+        self.ports.clear()
+        self.power_points.clear()
 
         matrix = asarray(Image.open(file_path))
         self.map = [[-1] * len(matrix[0]) for i in range(len(matrix))]
@@ -197,6 +225,21 @@ class Game:
             for point in self.power_points:
                 if self.get(point) - 1 in res:
                     res[self.get(point) - 1] += power_point_force
+        for port in self.ports:
+            if (x, y) == port[0]:
+                team = self.get(port[1]) - 1
+                if team in res:
+                    res[team] += force_around
+                else:
+                    res[team] = force_around
+            elif (x, y) == port[1]:
+                team = self.get(port[0]) - 1
+                if team in res:
+                    res[team] += force_around
+                else:
+                    res[team] = force_around
+            
+
         return res
 
     def battle(self, forces):
@@ -249,7 +292,6 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
-                r = (round(rect[0] + x / len(self.map[y]) * rect[2]), round(rect[1] + y / len(self.map) * rect[3]), rect[2] / len(self.map[y]), rect[3] / len(self.map))
                 r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size, size, size)
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
@@ -262,6 +304,8 @@ class Game:
         for x, y in self.power_points:
             r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size - flag.get_height(), 20, 20)
             screen.blit((flag if self.tick_count >= flag_activation else disabled_flag), r)
+        for (x, y), (x2, y2) in self.ports:
+            pygame.draw.line(screen, port_color, (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size + size//2, 10 + y * size + size//2), (round(screen_width / 2 - size * len(self.map[0]) / 2) + x2 * size + size//2, 10 + y2 * size + size//2), width=5)
         if self.check_end():
             text = font.render(self.teams[self.winner].name + " remporte la partie", True, (0, 0, 0))
             screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))

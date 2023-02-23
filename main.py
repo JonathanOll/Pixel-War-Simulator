@@ -19,7 +19,6 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # game
 game = Game((50, 50), [])
 game.load("maps/Europe.sav")
-# game.load("maps/Europe.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []
@@ -45,9 +44,9 @@ def draw(screen):
         screen.blit(font.render(game.teams[selected_team - 1].name if selected_team > 0 else "Neutre", True, (255, 255, 255)), (40, 10))
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        x = round((mouse_x - (screen_width // 2 - math.ceil(map_height / len(game.map)) * len(game.map[0]) // 2)) / (math.ceil(map_height / len(game.map))))
-        y = round((mouse_y - (screen_height // 2 - map_height // 2)) / (math.ceil(map_height / len(game.map))))
-        
+        x = int((mouse_x - round(screen_width / 2 - size * len(game.map[0]) / 2)) / size)
+        y = int((mouse_y - 10) / size)
+
         if game.is_valid(x, y) and game.get(x, y) != -1:
             screen.blit(font.render(game.teams[game.map[y][x] - 1].name if game.get(x, y) - 1 < len(game.teams) else "", True, (255, 255, 255)), (mouse_x + 10, mouse_y + 10))
 
@@ -82,8 +81,9 @@ while True:
                 show_interface = not show_interface
         if (event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]) or (event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0]):
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            x = round((mouse_x - (screen_width // 2 - math.ceil(map_height / len(game.map)) * len(game.map[0]) // 2)) / (math.ceil(map_height / len(game.map))))
-            y = round((mouse_y - (screen_height // 2 - map_height // 2)) / (math.ceil(map_height / len(game.map))))
+            size = math.ceil(map_height / len(game.map))
+            x = int((mouse_x - round(screen_width / 2 - size * len(game.map[0]) / 2)) / size)
+            y = int((mouse_y - 10) / size)
             if pygame.key.get_pressed()[pygame.K_LSHIFT]:
                 print((x, y))
             elif pygame.key.get_pressed()[pygame.K_LCTRL]:
