@@ -162,15 +162,15 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 color = (matrix[y][x][0], matrix[y][x][1], matrix[y][x][2])
-                if matrix[y][x][3] == 0:
+                if matrix[y][x][3] <= 5:
                     self.map[y][x] = -1
                 elif color in teams:
-                    self.map[y][x] = teams[color]
+                    self.map[y][x] = teams[color] + 1
                 else:
                     teams[color] = len(self.teams)
                     t = Team(str(len(self.teams)), color)
                     self.teams.append(t)
-                    self.map[y][x] = teams[color]
+                    self.map[y][x] = teams[color] + 1
         
         self.update_counts()
         
@@ -307,7 +307,7 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
-                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size, size, size)
+                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, screen_height // 2 - size * len(self.map) // 2 + y * size, size, size)
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
                 elif team == 0:
@@ -317,7 +317,7 @@ class Game:
         flag = transform.scale(flag_img, (4*size, 5*size))
         disabled_flag = transform.scale(disabled_flag_img, (4*size, 5*size))
         for x, y in self.power_points:
-            r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, 10 + y * size - flag.get_height(), 20, 20)
+            r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, screen_height // 2 - size * len(self.map) // 2 + y * size - flag.get_height(), 20, 20)
             screen.blit((flag if self.tick_count >= self.flag_activation else disabled_flag), r)
         for (x, y), (x2, y2) in self.ports:
             pygame.draw.line(screen, port_color, (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size + size//2, 10 + y * size + size//2), (round(screen_width / 2 - size * len(self.map[0]) / 2) + x2 * size + size//2, 10 + y2 * size + size//2), width=5)

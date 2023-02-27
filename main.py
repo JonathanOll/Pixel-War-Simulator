@@ -18,7 +18,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 # game
 game = Game((50, 50), [])
-game.load("maps/Départements de France.sav")
+game.load("maps/USA.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []
@@ -41,10 +41,11 @@ def draw(screen):
 
         pygame.draw.rect(screen, game.teams[selected_team - 1].color if selected_team > 0 else empty_ground_color, (10, 10, 25, 25))
         screen.blit(font.render(game.teams[selected_team - 1].name if selected_team > 0 else "Neutre", True, (255, 255, 255)), (40, 10))
-
+        
+        size = math.ceil(map_height / len(game.map))
         mouse_x, mouse_y = pygame.mouse.get_pos()
         x = int((mouse_x - round(screen_width / 2 - size * len(game.map[0]) / 2)) / size)
-        y = int((mouse_y - 10) / size)
+        y = int((mouse_y - (screen_height // 2 - size * len(game.map) // 2)) / size)
 
         if game.is_valid(x, y) and game.get(x, y) != -1:
             screen.blit(font.render(game.teams[game.map[y][x] - 1].name if game.get(x, y) - 1 < len(game.teams) else "", True, (255, 255, 255)), (mouse_x + 10, mouse_y + 10))
@@ -82,7 +83,7 @@ while True:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             size = math.ceil(map_height / len(game.map))
             x = int((mouse_x - round(screen_width / 2 - size * len(game.map[0]) / 2)) / size)
-            y = int((mouse_y - 10) / size)
+            y = int((mouse_y - (screen_height // 2 - size * len(game.map) // 2)) / size)
             if pygame.key.get_pressed()[pygame.K_LSHIFT]:
                 print((x, y))
             elif pygame.key.get_pressed()[pygame.K_LCTRL]:
