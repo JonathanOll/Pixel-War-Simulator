@@ -18,7 +18,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 # game
 game = Game((50, 50), [])
-game.load("maps/Europe.sav")
+game.load("maps/Départements de France.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []
@@ -87,6 +87,9 @@ while True:
                 print((x, y))
             elif pygame.key.get_pressed()[pygame.K_LCTRL]:
                 selected_team  = game.map[y][x]
+            elif pygame.key.get_pressed()[pygame.K_LALT]:
+                if game.get(x,y) > 0:
+                    game.teams[game.get(x, y) - 1].power += 1
             else:
                 if pen_size > 1:
                     for i in range(-pen_size, pen_size + 1):
