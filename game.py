@@ -6,6 +6,9 @@ from PIL import Image
 from numpy import asarray
 import math
 from pygame import transform
+import os
+from video_generator import montage
+
 
 class Team:
     def __init__(self, name, color, power=0):
@@ -299,6 +302,8 @@ class Game:
     def update(self):  # mettre à jour en fonction du temps passé depuis la derniere mise à jour
         if self.check_end():
             self.running = False
+            if record_games and edit_when_finished:
+                montage(folder_name)
         if self.running and time() - self.last_update > 1 / ticks_per_second:
             self.tick()
 
@@ -307,7 +312,7 @@ class Game:
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
-                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, screen_height // 2 - size * len(self.map) // 2 + y * size, size, size)
+                r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, (screen_height - 30) // 2 - size * len(self.map) // 2 + y * size, size, size)
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
                 elif team == 0:
@@ -317,10 +322,13 @@ class Game:
         flag = transform.scale(flag_img, (4*size, 5*size))
         disabled_flag = transform.scale(disabled_flag_img, (4*size, 5*size))
         for x, y in self.power_points:
-            r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, screen_height // 2 - size * len(self.map) // 2 + y * size - flag.get_height(), 20, 20)
+            r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, (screen_height - 30) // 2 - size * len(self.map) // 2 + y * size - flag.get_height(), 20, 20)
             screen.blit((flag if self.tick_count >= self.flag_activation else disabled_flag), r)
         for (x, y), (x2, y2) in self.ports:
-            pygame.draw.line(screen, port_color, (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size + size//2, 10 + y * size + size//2), (round(screen_width / 2 - size * len(self.map[0]) / 2) + x2 * size + size//2, 10 + y2 * size + size//2), width=5)
+            pygame.draw.line(screen, port_color, (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size + size//2, (screen_height - 30) // 2 - size * len(self.map) // 2 + y * size + size//2), (round(screen_width / 2 - size * len(self.map[0]) / 2) + x2 * size + size//2, (screen_height - 30) // 2 - size * len(self.map) // 2 + y2 * size + size//2), width=5)
         if self.check_end():
             text = font.render(self.teams[self.winner].name + " remporte la partie", True, (0, 0, 0))
             screen.blit(text, (screen_width // 2 - text.get_width() // 2, screen_height // 2 - text.get_height() // 2))
+        
+        if self.running and record_games:
+            pygame.image.save(screen, folder_name + str(len(os.listdir(folder_name))) + ".png")
