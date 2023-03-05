@@ -1,6 +1,7 @@
 # Pixel-War-Simulator
 [![image](https://img.shields.io/badge/Language-Python-yellow)](https://www.python.org/)
 [![image](https://img.shields.io/badge/Library-Pygame-orange)](https://www.pygame.org/)
+[![image](https://img.shields.io/badge/Library-OpenCV-green)](https://opencv.org/)
 [![image](https://img.shields.io/badge/Author-JonathanOll-blue)](https://github.com/JonathanOll/)
 
 Programme de simulation de "guerre" de territoire sur une carte
