@@ -300,7 +300,7 @@ class Game:
         self.tick_count += 1
     
     def update(self):  # mettre à jour en fonction du temps passé depuis la derniere mise à jour
-        if self.check_end():
+        if self.running and self.check_end():
             self.running = False
             if record_games and edit_when_finished:
                 montage(folder_name)

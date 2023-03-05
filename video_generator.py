@@ -2,10 +2,16 @@ import os
 import cv2
 import numpy as np
 from options import *
+from PIL import ImageFont, Image, ImageDraw
+from time import time
+
+
 
 def montage(folder, delete_old=True):
 
-    file = folder + "/result.mp4"
+    f = ImageFont.truetype("img/Proxima Nova Font.otf", 120)
+
+    file = folder + "result.mp4"
     print("generating " + file + " ...")
 
     file_list = os.listdir(folder)
@@ -17,19 +23,51 @@ def montage(folder, delete_old=True):
 
     last_img = None
 
+    last_print = time()
+    last_img_index = -1
+
     for i in range(duration*framerate):
-        img = np.zeros((height, width, 3), np.uint8)
-        
-        for j in range(3):
-            img[:,:,j] = background_color[2-j]
 
-        frame = cv2.imread(os.path.join(folder, file_list[int(i*len(file_list)/(framerate*duration))]))[8:8+source_height, 296:296+source_height]
-        frame = cv2.resize(frame, (width, width))
+        n = int(i*len(file_list)/(framerate*duration))
 
-        img[int(height/2-width/2):int(height/2+width/2),:] = frame
+        if n != last_img_index:
 
-        last_img = img
-        
+            if time() - last_print > 5:
+                print("Generating...", round(100*i/(duration*framerate), 2), "%")
+                last_print = time()
+            img = np.zeros((height, width, 3), np.uint8)
+            
+            for j in range(3):
+                img[:,:,j] = background_color[2-j]
+
+            frame = cv2.imread(os.path.join(folder, file_list[n]))[8:8+source_height, 296:296+source_height]
+            frame = cv2.resize(frame, (width, width))
+
+            img[int(height/2-width/2):int(height/2+width/2),:] = frame
+
+
+            img_pil = Image.fromarray(img)
+            draw = ImageDraw.Draw(img_pil)
+            _, _, text_w, _ = draw.textbbox((0, 0), top_text, font=f)
+            draw.text((int(1080/2-text_w/2), 200), top_text, font=f, fill=(255, 255, 255, 255))
+
+            total_y = 0
+
+            for j in range(len(bottom_text)):
+                _, _, text_w, text_h = draw.textbbox((0, 0), bottom_text[j], font=f)
+                draw.text((int(1080/2-text_w/2), 1450+total_y), bottom_text[j], font=f, fill=(255, 255, 255, 255))
+                total_y += text_h
+
+            img = np.array(img_pil)
+
+            last_img = img
+
+            last_img_index = n
+
+        else:
+            
+            img = last_img
+
         video_writer.write(img)
 
     for i in range(result_duration * framerate):

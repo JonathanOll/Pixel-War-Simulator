@@ -1,4 +1,3 @@
-from pygame import font as fon
 import pygame
 from time import time
 import os
@@ -17,9 +16,9 @@ map_height = 650  # taille de la carte en pixel
 
 ## PRECHARGEMENTS
 
-fon.init()
-font = fon.SysFont(None, 40)
-small_font = fon.SysFont(None, 30)
+pygame.font.init()
+font = pygame.font.Font("img/Proxima Nova Font.otf", 30)
+small_font = pygame.font.Font("img/Proxima Nova Font.otf", 20)
 flag_img = pygame.image.load("img/flag.png")
 disabled_flag_img = pygame.image.load("img/disabled_flag.png")
 
@@ -36,5 +35,5 @@ duration = 60  # durée de la partie, en secondes
 result_duration = 5  # durée d'affichage du gagnant, en secondes
 width, height = 1080, 1920  # taille de la vidéo
 source_width, source_height = 1280, 720  # taille des images d'origine
-top_text = ""  # texte affiché en haut de la vidéo
-bottom_text = ""  # text affiché au bas de la vidéo
+top_text = "Bataille de terrain"  # texte affiché en haut de la vidéo
+bottom_text = ["Abonnez vous et", "commentez votre", "département pour", "recevoir un boost !"]  # text affiché au bas de la vidéo
