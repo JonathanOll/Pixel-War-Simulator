@@ -28,5 +28,5 @@ https://user-images.githubusercontent.com/70845195/220421981-ad7ba32e-4d17-450e-
 
 - Installer une version de [python](https://www.python.org/) supérieure ou égale à 3.7
 - Installer pygame (éxécuter la commande `pip install pygame`)
-- Installer OpenCV (éxécuter la commande `pip install opencv-python`
+- Installer OpenCV (éxécuter la commande `pip install opencv-python`)
 - Télécharger le code et lancer le fichier main.py
