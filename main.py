@@ -18,7 +18,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 # game
 game = Game((50, 50), [])
-game.load("maps/Régions de France.sav")
+game.load("maps/Europe.sav")
 
 cases = sum(i.count for i in game.teams)
 ranking = []

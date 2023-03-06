@@ -30,6 +30,7 @@ os.mkdir(folder_name)
 record_games = True  # enregistrement des vidéos
 edit_when_finished = True  # faire le montage une fois la vidéo terminée
 
+min_x, max_x, min_y, max_y = 99999, -1, 99999, -1
 framerate = 30  # nombre d'image par seconde
 duration = 60  # durée de la partie, en secondes
 result_duration = 5  # durée d'affichage du gagnant, en secondes

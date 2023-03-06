@@ -6,8 +6,7 @@ from PIL import ImageFont, Image, ImageDraw
 from time import time
 
 
-
-def montage(folder, delete_old=True):
+def montage(folder, min_x, max_x, min_y, max_y, delete_old=True):
 
     f = ImageFont.truetype("img/Proxima Nova Font.otf", 120)
 
@@ -26,6 +25,8 @@ def montage(folder, delete_old=True):
     last_print = time()
     last_img_index = -1
 
+    ratio = (max_y - min_y) / (max_x - min_x)
+
     for i in range(duration*framerate):
 
         n = int(i*len(file_list)/(framerate*duration))
@@ -40,11 +41,10 @@ def montage(folder, delete_old=True):
             for j in range(3):
                 img[:,:,j] = background_color[2-j]
 
-            frame = cv2.imread(os.path.join(folder, file_list[n]))[8:8+source_height, 296:296+source_height]
-            frame = cv2.resize(frame, (width, width))
+            frame = cv2.imread(os.path.join(folder, file_list[n]))[min_y:max_y, min_x:max_x]
+            frame = cv2.resize(frame, (width, int(width * ratio)))
 
-            img[int(height/2-width/2):int(height/2+width/2),:] = frame
-
+            img[int(height/2-int(width * ratio)/2):int(height/2+int(width * ratio)/2),:] = frame
 
             img_pil = Image.fromarray(img)
             draw = ImageDraw.Draw(img_pil)

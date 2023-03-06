@@ -303,16 +303,23 @@ class Game:
         if self.running and self.check_end():
             self.running = False
             if record_games and edit_when_finished:
-                montage(folder_name)
+                montage(folder_name, min_x, max_x, min_y, max_y)
         if self.running and time() - self.last_update > 1 / ticks_per_second:
             self.tick()
 
     def draw(self, screen, rect=(290, 10, 700, 700)):
+
+        global min_x, max_x, min_y, max_y
+
         size = math.ceil(map_height / len(self.map))
         for y in range(len(self.map)):
             for x in range(len(self.map[y])):
                 team = self.get(x, y)
                 r = (round(screen_width / 2 - size * len(self.map[0]) / 2) + x * size, (screen_height - 30) // 2 - size * len(self.map) // 2 + y * size, size, size)
+                if r[0] < min_x : min_x = r[0]
+                if r[1] < min_y : min_y = r[1]
+                if r[0] + size > max_x  : max_x = r[0]
+                if r[1] + size > max_y  : max_y = r[1]
                 if team > 0:
                     pygame.draw.rect(screen, self.teams[self.get(x, y) - 1].color, r)
                 elif team == 0:
